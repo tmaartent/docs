@@ -58,6 +58,539 @@
     }
   ],
   "paths": {
+    "/auth/iot-policy": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Assign device policies to user account",
+        "description": "To be used sporadically to update user policies to allow specific connections to devices",
+        "operationId": "IoTPolicyFunction",
+        "requestBody": {
+          "description": "User policy information. Refer to [Amplify Docs](https://docs.amplify.aws/lib/auth/access_credentials/q/platform/flutter/) for more info on how to access them.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/iotPolicyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Result of a successful login attempt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/iotPolicyResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "All": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${IoTAuthFunction.Arn}/invocations"
+          }
+        },
+        "x-amazon-apigateway-request-validator": "body"
+      },
+      "options": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "IoTPolicyOptions",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Programatic user login.",
+        "description": "Can be used by third parties to acquire a JWT for authentication purposes",
+        "operationId": "LoginFunction",
+        "requestBody": {
+          "description": "User login information",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/userLogin"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Result of a successful login attempt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/loginInfo"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LoginFunction.Arn}/invocations"
+          }
+        },
+        "x-amazon-apigateway-request-validator": "body"
+      }
+    },
+    "/balancing/{companyName}": {
+      "post": {
+        "tags": [
+          "balancing"
+        ],
+        "summary": "Balancing company operations",
+        "description": "Attempt to preform balancing operations",
+        "operationId": "BalancingPost",
+        "parameters": [
+          {
+            "name": "companyName",
+            "in": "path",
+            "description": "Name of the company preforming the balancing operation",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Balacing action bodies",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/balanceRequest"
+              },
+              "examples": {
+                "BalanceResponsibility": {
+                  "$ref": "#/components/examples/balanceResponsibilityRequest"
+                },
+                "BalanceTest": {
+                  "$ref": "#/components/examples/balanceTestRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Operation successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/balanceResponsePost"
+                },
+                "examples": {
+                  "BalanceResponsibilitiesBasic": {
+                    "$ref": "#/components/examples/balanceResponsibilityResponse"
+                  },
+                  "BalanceTestBasic": {
+                    "$ref": "#/components/examples/balanceTestResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${BalancingFunction.Arn}/invocations"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "balancing"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "BalancingLuminusOptions",
+        "parameters": [
+          {
+            "name": "companyName",
+            "in": "path",
+            "description": "Name of the company preforming the balancing operation",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      }
+    },
+    "/balancing/{companyName}/{option}": {
+      "get": {
+        "tags": [
+          "balancing"
+        ],
+        "summary": "Balancing company operations",
+        "description": "Collect balancing information",
+        "operationId": "BalancingGetOps",
+        "parameters": [
+          {
+            "name": "companyName",
+            "in": "path",
+            "description": "Name of the company",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "option",
+            "in": "path",
+            "description": "Type of query to be performed",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "forecast",
+                "realized"
+              ]
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Start date of the query, must be a date in the ISO-8601 format",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "End date of the query, must be a date in the ISO-8601 format",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Type of forecast",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day-ahead-15",
+                "day-ahead-10"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/imbalanceResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Forecast": {
+                    "$ref": "#/components/examples/imbalanceResponseForecast"
+                  },
+                  "Realized": {
+                    "$ref": "#/components/examples/imbalanceResponseRealized"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${BalancingFunction.Arn}/invocations"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "balancing"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "BalancingLuminusOptionsOpt",
+        "parameters": [
+          {
+            "name": "companyName",
+            "in": "path",
+            "description": "Name of the company preforming the balancing operation",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "option",
+            "in": "path",
+            "description": "Type of query to be performed",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "forecast",
+                "realized"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      }
+    },
+    "/calculator": {
+      "post": {
+        "tags": [
+          "calculator"
+        ],
+        "summary": "Solar installation calculator",
+        "description": "Collects specific information and/or interacts with FlexIO devices.",
+        "operationId": "Calculator",
+        "parameters": [],
+        "requestBody": {
+          "description": "Action bodies",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/calculatorRequest"
+              },
+              "examples": {
+                "CalculateBasic": {
+                  "$ref": "#/components/examples/calculatorBasicRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Device object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/calculatorResponseOK"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/calculatorResponseError"
+                },
+                "examples": {
+                  "CalculateBasic": {
+                    "$ref": "#/components/examples/calculatorBasicErrorResponse"
+                  },
+                  "CalculateBatInvMismatch": {
+                    "$ref": "#/components/examples/calculatorErrorResponseBatInvMismatch"
+                  },
+                  "CalculateOutOfBounds": {
+                    "$ref": "#/components/examples/calculatorErrorResponseOutOfBounds"
+                  },
+                  "CalculateRegionSegment": {
+                    "$ref": "#/components/examples/calculatorErrorResponseRegionSegment"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/calculatorResponseInternalError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CalculatorFunctionDocker.Arn}/invocations"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "calculator"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "CalculatorOptions",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      }
+    },
     "/devices": {
       "get": {
         "tags": [
@@ -316,7 +849,52 @@
           }
         },
         "x-amazon-apigateway-request-validator": "params"
-      }
+      },
+      "options": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "DeviceInfoOptions",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "ID of FlexIO device",
+          "required": true,
+          "style": "simple",
+          "explode": false,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
     },
     "/devices/{id}/data": {
       "get": {
@@ -486,7 +1064,20 @@
           },
           "type": "mock"
         }
-      }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "ID of CloudFlex device",
+          "required": true,
+          "style": "simple",
+          "explode": false,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
     },
     "/devices/{id}/name": {
       "post": {
@@ -600,7 +1191,20 @@
           },
           "type": "mock"
         }
-      }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "ID of CloudFlex or FlexIO site",
+          "required": true,
+          "style": "simple",
+          "explode": false,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
     },
     "/devices/{id}/peripherals": {
       "get": {
@@ -815,7 +1419,20 @@
           },
           "type": "mock"
         }
-      }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "ID of CloudFlex device",
+          "required": true,
+          "style": "simple",
+          "explode": false,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
     },
     "/devices/{id}/savings": {
       "get": {
@@ -925,7 +1542,776 @@
           },
           "type": "mock"
         }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "ID of CloudFlex or FlexIo site",
+          "required": true,
+          "style": "simple",
+          "explode": false,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/devices/{id}/{action}": {
+      "get": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Device interaction",
+        "description": "Collects specific information and/or interacts with FlexIO devices.",
+        "operationId": "DeviceActionGetLogs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of FlexIO device",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "in": "path",
+            "description": "Action to preform:\n * `logs` (Partner & Admin): Collect device logs\n * `timestream` (All): Collect available device measurements\n * `savings` (All): Collect the savings from this device\n * `schema` (All): Collect device schema\n * `logs` (Partners & admin): Collect diagnostic logs from your device\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "logs",
+                "timestream",
+                "savings",
+                "schema"
+              ]
+            }
+          },
+          {
+            "name": "logName",
+            "in": "query",
+            "description": "Name of the log to collect entries for - only used for `action=logs`",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "db",
+            "in": "query",
+            "description": "Name of the databse to collect measurements from (should be set to `sampleDB`) - only used for `action=timestream`",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of log entries to return - only used for `action=logs`",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "nextToken",
+            "in": "query",
+            "description": "String to continue pagination of a previous query - only used for `action=logs`",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "description": "Maximum time range to collect entries from - only used for `action=logs`",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "forward",
+            "in": "query",
+            "description": "Weather to search forward in time or reverse - only used for `action=logs`",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Device object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/logsResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/timestreamGetResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/deviceSchemaGetResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Logs": {
+                    "$ref": "#/components/examples/logsResponse"
+                  },
+                  "Schema": {
+                    "$ref": "#/components/examples/deviceSchemaGetResponse"
+                  },
+                  "Timestream": {
+                    "$ref": "#/components/examples/timestreamGetResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "All": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DevicesFunction.Arn}/invocations"
+          }
+        },
+        "x-amazon-apigateway-request-validator": "params"
+      },
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Device interaction",
+        "description": "Collects specific information and/or interacts with FlexIO devices.",
+        "operationId": "DeviceActionPost",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of FlexIO device",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "in": "path",
+            "description": "Action to preform:\n * `link` (Partner & Admin): Link device to account,\n * `config`(All): Set configuration of device. Requires a POST request,\n * `timestream`(All): Collect timeseries data from a device.\n * `balancing`(All): Submit balancing info.\n * `realTime`(All): Setup real time.\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "link",
+                "config",
+                "timestream",
+                "balancing",
+                "realTime"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Action bodies",
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/linkRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/timestreamPostRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/configRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/balancingRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/realTimeRequest"
+                  }
+                ]
+              },
+              "examples": {
+                "Balancing": {
+                  "$ref": "#/components/examples/balancingRequest"
+                },
+                "Config": {
+                  "$ref": "#/components/examples/configRequest"
+                },
+                "Link": {
+                  "$ref": "#/components/examples/linkRequest"
+                },
+                "RealTime": {
+                  "$ref": "#/components/examples/realTimeRequest"
+                },
+                "Timestream": {
+                  "$ref": "#/components/examples/timestreamPostRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Device object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/linkResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/configResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/timestreamPostResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/balancingResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/realTimeResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Balancing": {
+                    "$ref": "#/components/examples/balancingResponse"
+                  },
+                  "Config": {
+                    "$ref": "#/components/examples/configResponse"
+                  },
+                  "LinkExample": {
+                    "$ref": "#/components/examples/linkResponse"
+                  },
+                  "RealTime": {
+                    "$ref": "#/components/examples/realTimeResponse"
+                  },
+                  "Timestream": {
+                    "$ref": "#/components/examples/timestreamPostResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "All": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DevicesFunction.Arn}/invocations"
+          }
+        },
+        "x-amazon-apigateway-request-validator": "params"
+      },
+      "delete": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Device interaction",
+        "description": "Collects specific information and/or interacts with FlexIO devices.",
+        "operationId": "DeviceActionDelete",
+        "parameters": [
+          {
+            "name": "action",
+            "in": "path",
+            "description": "Action to preform:\n * `link` (Partner & Admin): Unlink device from account\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "link"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Device object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/linkResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "All": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DevicesFunction.Arn}/invocations"
+          }
+        },
+        "x-amazon-apigateway-request-validator": "params"
+      },
+      "options": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "DeviceActionOptions",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "ID of FlexIO device",
+          "required": true,
+          "style": "simple",
+          "explode": false,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "action",
+          "in": "path",
+          "description": "Action to preform\n",
+          "required": true,
+          "style": "simple",
+          "explode": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "Value (do not use)"
+            ]
+          }
+        }
+      ]
+    },
+    "/docs": {
+      "get": {
+        "tags": [
+          "docs"
+        ],
+        "operationId": "docs",
+        "responses": {
+          "200": {
+            "description": "A 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Custom": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "timeoutInMillis": 10000,
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DocsFunction.Arn}/invocations"
+          }
+        }
       }
+    },
+    "/ev/{brand}": {
+      "post": {
+        "tags": [
+          "ev"
+        ],
+        "summary": "EV REST api proxies",
+        "description": "Creates proxies for differnt EV brands' REST APIs.",
+        "operationId": "EvActionPost",
+        "requestBody": {
+          "description": "EV REST API proxy request objects",
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/evWallboxAuthRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/evWallboxChargersRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/evWallboxChargerRequest"
+                  }
+                ]
+              },
+              "examples": {
+                "WallboxAuth": {
+                  "$ref": "#/components/examples/evWallboxAuthRequest"
+                },
+                "WallboxCharger": {
+                  "$ref": "#/components/examples/evWallboxChargerRequest"
+                },
+                "WallboxChargers": {
+                  "$ref": "#/components/examples/evWallboxChargersRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "EV REST API proxy response objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/evWallboxAuthResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/evWallboxChargersResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/evWallboxChargerResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "WallboxAuth": {
+                    "$ref": "#/components/examples/evWallboxAuthResponse"
+                  },
+                  "WallboxCharger": {
+                    "$ref": "#/components/examples/evWallboxChargerResponse"
+                  },
+                  "WallboxChargers": {
+                    "$ref": "#/components/examples/evWallboxChargersResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "All": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${EvFunction.Arn}/invocations"
+          }
+        },
+        "x-amazon-apigateway-request-validator": "params"
+      },
+      "options": {
+        "tags": [
+          "ev"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "EvOptions",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      },
+      "parameters": [
+        {
+          "name": "brand",
+          "in": "path",
+          "description": "Brand name of supported EV REST API",
+          "required": true,
+          "style": "simple",
+          "explode": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "wallbox"
+            ]
+          }
+        }
+      ]
+    },
+    "/files/releases": {
+      "get": {
+        "tags": [
+          "files"
+        ],
+        "operationId": "ReleasesGet",
+        "responses": {
+          "200": {
+            "description": "Collect a list of available releases",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/releasesResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Certificates": {
+                    "$ref": "#/components/examples/releasesResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Admin": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "timeoutInMillis": 10000,
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FilesListFunction.Arn}/invocations"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "files"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "ReleasesOptions",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      }
+    },
+    "/files/releases/{id+}": {
+      "get": {
+        "tags": [
+          "files"
+        ],
+        "operationId": "ReleasesDownload",
+        "responses": {
+          "200": {
+            "description": "Generate a download link for a release file",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/releasesDownloadResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Certificates": {
+                    "$ref": "#/components/examples/releasesDownloadResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Admin": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "timeoutInMillis": 10000,
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FilesFunction.Arn}/invocations"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "ev"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "FileOptions",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "description": "Id of file to download",
+          "required": true,
+          "style": "simple",
+          "explode": false,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
     },
     "/fleet": {
       "get": {
@@ -1274,6 +2660,800 @@
             }
           },
           "type": "mock"
+        }
+      }
+    },
+    "/fleet/certificates": {
+      "get": {
+        "tags": [
+          "fleet"
+        ],
+        "operationId": "FleetCertificates",
+        "responses": {
+          "200": {
+            "description": "Fleet certificate generation response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/fleetCertificateResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Certificates": {
+                    "$ref": "#/components/examples/fleetCertificateResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "timeoutInMillis": 29000,
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FleetFunction.Arn}/invocations"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "fleet"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "FleetCertificatesOptions",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-api-key-source": "HEADER",
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      }
+    },
+    "/fleet/{action}": {
+      "get": {
+        "tags": [
+          "fleet"
+        ],
+        "operationId": "FleetInfoAll",
+        "parameters": [
+          {
+            "name": "action",
+            "in": "path",
+            "description": "Action to preform:\n * `apikey` (Partner & Admin): Returns API Key of account,\n * `aggregate`(Partner & Admin): Collect aggregate status of fleet devices.\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "apikey",
+                "certificates",
+                "aggregate"
+              ]
+            }
+          },
+          {
+            "name": "thingGroupName",
+            "in": "query",
+            "description": "Name of the group to interact with. Required for `certificates`, `apikey` and `aggregate` actions",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "apiKeyId",
+            "in": "query",
+            "description": "API key ID string. Collected from the `apikey` action.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fleet timeseries response object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/fleetApiKeyResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/fleetAggregateResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Aggregate": {
+                    "$ref": "#/components/examples/fleetAggregateResponse"
+                  },
+                  "ApiKey": {
+                    "$ref": "#/components/examples/fleetApiKeyResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminPartner": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "timeoutInMillis": 29000,
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FleetFunction.Arn}/invocations"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "fleet"
+        ],
+        "operationId": "FleetTimeseries",
+        "parameters": [
+          {
+            "name": "action",
+            "in": "path",
+            "description": "Action to preform:\n * `timeseries` (Partner & Admin): Queries fleet timeseries,\n * `claim-device` (Partner & Admin): Claim a device into a fleet,\n",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "timeseries",
+                "claim-device"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Fleet timeseries request",
+          "content": {
+            "application/json": {
+              "schema": {},
+              "examples": {
+                "Claim": {
+                  "$ref": "#/components/examples/fleetDeviceClaimRequest"
+                },
+                "Info": {
+                  "$ref": "#/components/examples/fleetTimeseriesRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Fleet timeseries response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/fleetTimeseriesResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/fleetDeviceClaimResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Info": {
+                    "$ref": "#/components/examples/fleetDeviceClaimResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminPartner": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FleetFunction.Arn}/invocations"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "fleet"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "FleetActionOptions",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      },
+      "parameters": [
+        {
+          "name": "action",
+          "in": "path",
+          "description": "Action to preform:\n",
+          "required": true,
+          "style": "simple",
+          "explode": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "Value (don't use this)"
+            ]
+          }
+        }
+      ]
+    },
+    "/supported": {
+      "get": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Show supported devices and models",
+        "description": "Provides a list of supported devices and models",
+        "operationId": "supported",
+        "responses": {
+          "200": {
+            "description": "Device list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/supportedList"
+                },
+                "examples": {
+                  "BasicList": {
+                    "$ref": "#/components/examples/devicesSupportedResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SupportedFunction.Arn}/invocations"
+          }
+        },
+        "x-amazon-apigateway-request-validator": "params"
+      },
+      "options": {
+        "tags": [
+          "terms"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "supportedOptions",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      }
+    },
+    "/swagger.json": {
+      "get": {
+        "tags": [
+          "docs"
+        ],
+        "operationId": "swaggerJson",
+        "responses": {
+          "200": {
+            "description": "A 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Custom": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "timeoutInMillis": 10000,
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DocsFunction.Arn}/invocations"
+          }
+        }
+      }
+    },
+      "/user": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "operationId": "UserInfo",
+        "responses": {
+          "200": {
+            "description": "User action response",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "examples": {
+                  "Info": {
+                    "$ref": "#/components/examples/userGetResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "All": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "timeoutInMillis": 10000,
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UserFunction.Arn}/invocations"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "users"
+        ],
+        "operationId": "UserEdit",
+        "requestBody": {
+          "description": "User edit request object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/userPutRequest"
+              },
+              "examples": {
+                "Info": {
+                  "$ref": "#/components/examples/userPutRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "User edit response object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/userPutResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Info": {
+                    "$ref": "#/components/examples/userPutResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "All": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UserFunction.Arn}/invocations"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "operationId": "UserCreate",
+        "requestBody": {
+          "description": "User creation request object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/userPostRequest"
+              },
+              "examples": {
+                "Info": {
+                  "$ref": "#/components/examples/userPostRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "User creation response object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/userPostResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Info": {
+                    "$ref": "#/components/examples/userPostResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "All": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UserFunction.Arn}/invocations"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "users"
+        ],
+        "operationId": "UserDelete",
+        "requestBody": {
+          "description": "User deletion request object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/userDeleteRequest"
+              },
+              "examples": {
+                "Info": {
+                  "$ref": "#/components/examples/userDeleteRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "User delete response object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/userDeleteResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Info": {
+                    "$ref": "#/components/examples/userDeleteResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "AdminPartner": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UserFunction.Arn}/invocations"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "users"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "UserOptions",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      }
+    },
+    "/user/all": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "operationId": "UserAllGet",
+        "responses": {
+          "200": {
+            "description": "Get all users response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/userGetAllResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Info": {
+                    "$ref": "#/components/examples/userGetAllResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "All": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UserFunction.Arn}/invocations"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "users"
+        ],
+        "summary": "CORS support",
+        "description": "Enable CORS by returning correct headers",
+        "operationId": "UserAllOptions",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/OptionsCORS"
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "requestTemplates": {
+            "application/json": "{\n  \"statusCode\" : 200\n}\n"
+          },
+          "responses": {
+            "default": {
+              "responseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                "method.response.header.Access-Control-Allow-Methods": "'*'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'"
+              },
+              "responseTemplates": {
+                "application/json": "{}\n"
+              },
+              "statusCode": "200"
+            }
+          },
+          "type": "mock"
+        }
+      }
+    },
+    "/ws-docs": {
+      "get": {
+        "tags": [
+          "docs"
+        ],
+        "operationId": "wsDocs",
+        "responses": {
+          "200": {
+            "description": "A 200 response.",
+            "content": {
+              "html/text": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Custom": []
+          }
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "timeoutInMillis": 10000,
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${WsDocsFunction.Arn}/invocations"
+          }
+        }
+      }
+    },
+    "/{proxy+}": {
+      "parameters": [
+        {
+          "name": "proxy+",
+          "in": "path",
+          "description": "Multiple path catch-all for documentation files",
+          "required": true,
+          "style": "simple",
+          "explode": false,
+          "schema": {
+            "type": "string",
+            "enum": [
+              "wallbox"
+            ]
+          }
+        }
+      ],
+      "x-amazon-apigateway-any-method": {
+        "operationId": "docs",
+        "produces": [
+          "application/json"
+        ],
+        "x-amazon-apigateway-integration": {
+          "credentials": {
+            "Fn::Sub": "${ApiRole.Arn}"
+          },
+          "httpMethod": "POST",
+          "timeoutInMillis": 10000,
+          "type": "aws_proxy",
+          "uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DocsFunction.Arn}/invocations"
+          }
         }
       }
     }
