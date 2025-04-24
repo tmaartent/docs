@@ -58,32 +58,6 @@
     }
   ],
   "paths": {
-    "/auth/emsschema": {
-      "get": {
-        "tags": [
-          "auth"
-        ],
-        "summary": "Schema definition for EMS systems",
-        "operationId": "GetEMSSchema",
-        "responses": {
-          "200": {
-            "description": "Returns the EMS schema definition",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/emsschema"
-                },
-                "examples": {
-                  "EMS Example": {
-                    "$ref": "#/components/examples/emsschema"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/auth/iot-policy": {
       "post": {
         "tags": [

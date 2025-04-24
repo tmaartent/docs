@@ -10,10 +10,15 @@ There are two main components in the EMS Loop:
 
 The orchestrator acts as the central coordinator. Every minute it will
 
-- gather all relevant virtual sites
-- divide them into manageable groups
-- package the necessary information
-- launches an EMS function for each group
+```mermaid
+flowchart TD
+    B[Gather virtual sites]
+    C[Divide into manageable groups]
+    D[Package information for each group]
+    E[Launch EMS Function for each group]
+
+    B --> C --> D --> E
+```
 
 This approach ensures the system remains organized and scalable.
 
@@ -21,8 +26,15 @@ This approach ensures the system remains organized and scalable.
 
 The EMS function will
 
-- process the packaged device data
-- collect the most recent information from each device in its group
-- run the Flexio EMS to generate new set points.
+```mermaid
+flowchart TD
+    A[Receive packaged device data]
+    B[Collect latest device information]
+    C[Run Flexio EMS]
+    D[Store new set points for API access]
 
-These set points are then stored for API access. The EMS function is designed to run concurrently and on-demand, as triggered by the orchestrator.
+    A --> B --> C --> D
+
+```
+
+The EMS function is designed to run concurrently and on-demand, as triggered by the orchestrator.

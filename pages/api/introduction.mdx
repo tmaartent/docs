@@ -101,7 +101,40 @@ Explanation:
     </Expandable>
 </ResponseField>
 
-## Managing Sites with the API
+---
 
-You can create, view, update, or delete your virtual sites using our CloudFlex API.
-Here’s how you interact with the main resources:
+## CloudFlex API Workflow Example
+
+Below is a typical workflow for using the CloudFlex APIs to manage your virtual sites and assets:
+
+```mermaid
+flowchart TD
+A[Login & Authenticate] --> B[Create Site]
+B --> C[Add Site Asset]
+C --> D[Send Site Data]
+D --> E[Collect Set Points]
+E --> F[Monitor & Update]
+```
+
+---
+
+### Authenticate
+- Send a POST request to the [login endpoint](/pages/api/introduction) with your credentials to obtain a bearer token.
+
+### Create a Site
+- Use the [Create Site](/pages/api/create-sites) endpoint to register a new virtual site.
+
+### Add Assets to the Site
+- Use the [Add Site Asset](/pages/api/add-site-asset) endpoint to associate assets with your site.
+
+### Send Device Data
+- Periodically send operational data to your site using the [Send Site Data](/pages/api/send-site-data) endpoint.
+
+### Collect Set Points
+- Retrieve the latest set points for your site using the [Collect Set Points](/pages/api/collect-set-points) endpoint and apply them to your devices.
+
+### Monitor and Update
+- Use [List Sites](/pages/api/list-sites), [Basic Site Information](/pages/api/basic-site-information), and [Site Savings & Earnings](/pages/api/site-savings-earnings) to monitor your sites.
+- Edit or remove sites/assets as needed using the appropriate endpoints.
+
+<Tip>Repeat steps 4 and 5 in a loop to keep your virtual site data and control set points up to date.</Tip>

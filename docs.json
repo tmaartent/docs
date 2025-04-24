@@ -17,69 +17,70 @@
           {
             "group": "Home",
             "pages": [
-              "introduction",
+              "/pages/introduction",
               {
                 "group": "Use cases",
                 "pages": ["/pages/use-cases/enterprise", "/pages/use-cases/end-users"]
               },
               {"group": "Infrastructure",
               "pages":  [
-                {
-                  "group": "CloudFlex API",
-                  "pages": [
-                    "/pages/api/introduction",
-                    {
-                      "group": "Sites",
-                      "pages": [
-                        {
-                          "group": "CRUD",
-                          "pages": [
-                            "/pages/api/create-sites",
-                            "/pages/api/remove-existing-site",
-                            "/pages/api/edit-existing-site",
-                            "/pages/api/change-display-name"
-                          ]
-                        },
-                        {
-                          "group": "Site assets",
-                          "pages": [
-                            "/pages/api/add-site-asset",
-                            "/pages/api/remove-site-asset",
-                            "/pages/api/list-site-assets"
-                          ]
-                        },
-                        {
-                          "group": "Site Information",
-                          "pages": [
-                            "/pages/api/list-sites",
-                            "/pages/api/basic-site-information",
-                            "/pages/api/site-savings-earnings",
-                            "/pages/api/send-site-data",
-                            "/pages/api/collect-set-points"
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "group": "Fleet",
-                      "pages": [
-                        "/pages/api/fleet-all",
-                        "/pages/api/create-site-fleets",
-                        "/pages/api/edit-site-fleets",
-                        "/pages/api/remove-site-fleets"
-                      ]
-                    },
-                    {
-                      "group": "Schemas",
-                      "pages": [
-                        "/pages/api/schemas/site-asset",
-                        "/pages/api/schemas/emsschema"
-                      ]
-                    }
-                  ]
-                },
               "/pages/infrastructure/cloud-ems-loop",
-              "/pages/infrastructure/integrations-loop"]}
+              "/pages/infrastructure/integrations-loop"]
+              },
+              {
+                "group": "CloudFlex API",
+                "pages": [
+                  "/pages/api/introduction",
+                  {
+                    "group": "Sites",
+                    "pages": [
+                      {
+                        "group": "CRUD",
+                        "pages": [
+                          "/pages/api/create-sites",
+                          "/pages/api/remove-existing-site",
+                          "/pages/api/edit-existing-site",
+                          "/pages/api/change-display-name"
+                        ]
+                      },
+                      {
+                        "group": "Site assets",
+                        "pages": [
+                          "/pages/api/add-site-asset",
+                          "/pages/api/remove-site-asset",
+                          "/pages/api/list-site-assets"
+                        ]
+                      },
+                      {
+                        "group": "Site Information",
+                        "pages": [
+                          "/pages/api/list-sites",
+                          "/pages/api/basic-site-information",
+                          "/pages/api/site-savings-earnings",
+                          "/pages/api/send-site-data",
+                          "/pages/api/collect-set-points"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Fleet",
+                    "pages": [
+                      "/pages/api/fleet-all",
+                      "/pages/api/create-site-fleets",
+                      "/pages/api/edit-site-fleets",
+                      "/pages/api/remove-site-fleets"
+                    ]
+                  },
+                  {
+                    "group": "Schemas",
+                    "pages": [
+                      "/pages/api/schemas/site-asset",
+                      "/pages/api/schemas/emsschema"
+                    ]
+                  }
+                ]
+              }
             ]
           },
           {
@@ -94,6 +95,9 @@
         "openapi": "api-reference/openapi.json"
       }
     ]
+  },
+  "icons": {
+    "library": "lucide"
   },
   "logo": {
     "light": "/logo/light.svg",
