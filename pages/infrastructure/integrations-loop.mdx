@@ -1,0 +1,18 @@
+---
+title: CloudFlex Integrations Loop
+sidebarTitle: Integrations Loop
+description: In some situations, CloudFlex needs to automatically control devices that are supported individually.
+---
+
+See [Use cases](/pages/use-cases/end-users) for applicable scenarios.
+
+To make this possible, there’s an internal loop that collects data from these devices and manages them using the brand APIs they support.
+This integrations loop is made up of two main components:
+
+## Orchestrator Function
+
+The orchestrator coordinates the process by gathering all relevant devices, organizing them into manageable groups, and preparing the information needed for the next step. It then triggers the management function for each group, ensuring everything runs efficiently and at scale.
+
+## Management Function
+
+The management function takes over for each group, collecting the latest data from the devices and applying the CloudFlex set points using the appropriate brand APIs. This function ensures that each device is updated and controlled as intended, working in tandem with the orchestrator for smooth operation.

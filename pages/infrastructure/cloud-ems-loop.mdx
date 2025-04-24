@@ -1,0 +1,28 @@
+---
+title: CloudFlex EMS Loop
+description: The CloudFlex EMS Loop is the automated infrastructure that keeps your virtual sites up to date. It collects the latest device data, processes it using the Flexio EMS, and stores new set points for retrieval via the data API.
+sidebarTitle: CloudFlex EMS Loop
+---
+
+There are two main components in the EMS Loop:
+
+## Orchestrator Function
+
+The orchestrator acts as the central coordinator. Every minute it will
+
+- gather all relevant virtual sites
+- divide them into manageable groups
+- package the necessary information
+- launches an EMS function for each group
+
+This approach ensures the system remains organized and scalable.
+
+## EMS Function
+
+The EMS function will
+
+- process the packaged device data
+- collect the most recent information from each device in its group
+- run the Flexio EMS to generate new set points.
+
+These set points are then stored for API access. The EMS function is designed to run concurrently and on-demand, as triggered by the orchestrator.

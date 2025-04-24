@@ -1,0 +1,11 @@
+---
+title: "Collecting Set Points"
+openapi: "/api-reference/openapi.json GET /devices/{id}/data"
+description: When your site sends in data, CloudFlex EMS (FlexIO) processes it — along with your site’s settings — to generate set points for your assets.
+---
+
+Be sure to follow each set point individually. For example, if your installation doesn’t support battery power control, just use the ACDC power control instead (and vice versa).
+
+<Note>
+    Whenever possible, it’s best to use the powerSetpointMeter set point. You can use other set points to control specific assets if needed. For example, if you’re using powerSetpointBat, make sure the inverter power stays below powerSetpointACDC. This helps the EMS avoid missing curtailment events.
+</Note>

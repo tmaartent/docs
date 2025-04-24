@@ -1,0 +1,652 @@
+---
+title: CloudFlex API
+description: Think of a virtual site as a digital twin of a FlexBox. It’s set up in AWS just like a FlexBox, and all its data lives right alongside FlexBox data. This means you get all the benefits of our existing tools, plus the freedom to customize your virtual sites as needed.
+---
+
+The CloudFlex API enables organizations to manage their virtual sites.
+
+## Development Levels
+
+The CloudFlex API is available in three different stages, each designed for a specific purpose:
+
+<AccordionGroup>
+    <Accordion title="Next">
+        Where the newest features land first. The Next stage is for testing bleeding-edge code, so things here may not always work as expected.<br/>
+        <Link href="https://api.io-comms.com/next/">https://api.io-comms.com/next/</Link>
+    </Accordion>
+    <Accordion title="Development">
+        Features preparing for production are tested here. The Development stage is great for getting ready for upcoming changes, but be aware that things can still break.<br/>
+        <Link href="https://api.io-comms.com/dev/">https://api.io-comms.com/dev/</Link>
+    </Accordion>
+    <Accordion title="Production" defaultOpen="true">
+        This is the stable release, where all features have been thoroughly tested and are ready for everyday use.<br/>
+        <Link href="https://api.io-comms.com/v1/">https://api.io-comms.com/v1/</Link>
+    </Accordion>
+</AccordionGroup>
+
+<Warning>
+    For third-party integrations, we recommend using the <b>Production</b> or <b>Development</b> stages. The <b>Next</b> branch is intended mainly for internal testing and may not be reliable for external use.
+</Warning>
+
+## Login
+
+All CloudFlex API endpoints require a JSX bearer token for authentication. You can obtain this token by sending a POST request to the login endpoint with your partner username and password. Here’s how to do it in various languages:
+
+<CodeGroup>
+
+    ```python login.py
+    import requests
+
+    url = "https://api.io-comms.com/v1/auth/login"
+    data = {
+    "username": "<USER_EMAIL>",
+    "password": "<USER_PASSWORD>"
+}
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(url, json=data, headers=headers)
+    print(response.json())
+    ```
+
+    ```javascript login.js
+    const fetch = require('node-fetch');
+
+    const url = 'https://api.io-comms.com/v1/auth/login';
+    const data = {
+    username: '<USER_EMAIL>',
+    password: '<USER_PASSWORD>'
+};
+    fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+})
+    .then(res => res.json())
+    .then(json => console.log(json));
+    ```
+
+    ```bash login.sh
+    curl --location 'https://api.io-comms.com/v1/auth/login' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+    "username": "<USER_EMAIL>",
+    "password": "<USER_PASSWORD>"
+}'
+    ```
+
+</CodeGroup>
+
+The output will look like this:
+
+```json
+{
+  "token": "<JSX_BEARER_TOKEN>",
+  "refreshToken": "<REFRESH_TOKEN>",
+  "type": "partner" // can also be "admin" or "consumer"
+}
+```
+Explanation:
+
+<ResponseField name="token" type="string">
+    The JSX bearer token, to be used on protected calls
+</ResponseField>
+<ResponseField name="refreshToken" type="string">
+    Use this token to refresh your session without needing to log in again with your username and password.
+</ResponseField>
+<ResponseField name="type" type="string">
+    <Expandable title="Possible values">
+        <ResponseField name="admin" type="string">Lifepowr Admin user (rare for third parties)</ResponseField>
+        <ResponseField name="partner" type="string">Partner user (most common for partners)</ResponseField>
+        <ResponseField name="consumer" type="string">End user (typically at the app level)</ResponseField>
+    </Expandable>
+</ResponseField>
+
+## Managing Sites with the API
+
+You can create, view, update, or delete your virtual sites using our CloudFlex API.
+Here’s how you interact with the main resources:
+
+### Create Sites
+
+To have CloudFlex process third-party sites, you first need to create them on the CloudFlex platform. This is done by sending a POST request to the `/devices` endpoint. You can create up to 50 sites per call. The request body should contain a list of sites, each represented by an object with the following parameters:
+
+<ParamField body="ean" type="string" required="true">
+    The EAN of the meter to be controlled. This number can be found on your energy bill or obtained from your energy supplier (the latter may require a special agreement).
+</ParamField>
+  <ParamField body="settings" type="object" required="true">
+    The site settings that represent the assets to be controlled. See the Settings section for more details.
+</ParamField>
+  <ParamField body="targetFleet" type="string" required="true">
+    The name of the site fleet where the site should be placed. See the Site Fleet section for more info.
+</ParamField>
+
+<CodeGroup>
+
+    ```python create-sites.py
+    import requests
+
+    url = "https://api.io-comms.com/dev/devices/"
+    headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <BEARER_TOKEN>"
+}
+    data = {
+    "devices": [
+{
+    "settings": {
+    "tariffStructure": {
+    "tariffType": "SingleTariffVariable"
+},
+    "VAT": 6,
+    "dso": "FLUVIUSANTWERPEN",
+    "minimumStateOfCharge": 10,
+    "maximumStateOfCharge": 100,
+    "maximumReserveStateOfCharge": 25,
+    "latitude": 50.85,
+    "longitude": 4.35,
+    "meterCurrentLimitation": 25,
+    "ACPhaseCount": "1x230V",
+    "converters": [
+{
+    "maxACDCPower": 5000,
+    "maxBatteryChargePower": 5000,
+    "maxBatteryDischargePower": 5000,
+    "maxMPPTPower": 6000,
+    "pvArrays": [],
+    "curtailmentType": "type-N",
+    "battery": {
+    "batteryType": "None",
+    "packCount": 0,
+    "cellsPerPack": 0,
+    "cellCapacity": 0,
+    "cellRatedVoltage": 0,
+    "cellMaxVoltage": 0,
+    "cellMinVoltage": 0,
+    "cellMaxCurrent": 0,
+    "balancingCurrent": 0
+}
+}
+    ],
+    "EVChargers": []
+},
+    "ean": "541456700001772329",
+    "targetFleet": "<FLEET_STRING>"
+}
+    ]
+}
+    response = requests.post(url, headers=headers, json=data)
+    print(response.json())
+    ```
+
+    ```javascript create-sites.js
+    const fetch = require('node-fetch');
+
+    const url = 'https://api.io-comms.com/dev/devices/';
+    const data = {
+    devices: [
+{
+    settings: {
+    tariffStructure: {
+    tariffType: 'SingleTariffVariable'
+},
+    VAT: 6,
+    dso: 'FLUVIUSANTWERPEN',
+    minimumStateOfCharge: 10,
+    maximumStateOfCharge: 100,
+    maximumReserveStateOfCharge: 25,
+    latitude: 50.85,
+    longitude: 4.35,
+    meterCurrentLimitation: 25,
+    ACPhaseCount: '1x230V',
+    converters: [
+{
+    maxACDCPower: 5000,
+    maxBatteryChargePower: 5000,
+    maxBatteryDischargePower: 5000,
+    maxMPPTPower: 6000,
+    pvArrays: [],
+    curtailmentType: 'type-N',
+    battery: {
+    batteryType: 'None',
+    packCount: 0,
+    cellsPerPack: 0,
+    cellCapacity: 0,
+    cellRatedVoltage: 0,
+    cellMaxVoltage: 0,
+    cellMinVoltage: 0,
+    cellMaxCurrent: 0,
+    balancingCurrent: 0
+}
+}
+    ],
+    EVChargers: []
+},
+    ean: '541456700001772329',
+    targetFleet: '<FLEET_STRING>'
+}
+    ]
+};
+
+    fetch(url, {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer <BEARER_TOKEN>'
+},
+    body: JSON.stringify(data, null, 2)
+})
+    .then(res => res.json())
+    .then(json => console.log(json));
+    ```
+
+    ```java CreateSites.java
+    import java.net.HttpURLConnection;
+    import java.net.URL;
+    import java.io.OutputStream;
+    import java.io.BufferedReader;
+    import java.io.InputStreamReader;
+
+    public class CreateSites {
+    public static void main(String[] args) throws Exception {
+    URL url = new URL("https://api.io-comms.com/dev/devices/");
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    conn.setRequestMethod("POST");
+    conn.setRequestProperty("Content-Type", "application/json");
+    conn.setRequestProperty("Authorization", "Bearer <BEARER_TOKEN>");
+    conn.setDoOutput(true);
+    String jsonInputString = """
+{
+    "devices": [
+{
+    "settings": {
+    "tariffStructure": {
+    "tariffType": "SingleTariffVariable"
+},
+    "VAT": 6,
+    "dso": "FLUVIUSANTWERPEN",
+    "minimumStateOfCharge": 10,
+    "maximumStateOfCharge": 100,
+    "maximumReserveStateOfCharge": 25,
+    "latitude": 50.85,
+    "longitude": 4.35,
+    "meterCurrentLimitation": 25,
+    "ACPhaseCount": "1x230V",
+    "converters": [
+{
+    "maxACDCPower": 5000,
+    "maxBatteryChargePower": 5000,
+    "maxBatteryDischargePower": 5000,
+    "maxMPPTPower": 6000,
+    "pvArrays": [],
+    "curtailmentType": "type-N",
+    "battery": {
+    "batteryType": "None",
+    "packCount": 0,
+    "cellsPerPack": 0,
+    "cellCapacity": 0,
+    "cellRatedVoltage": 0,
+    "cellMaxVoltage": 0,
+    "cellMinVoltage": 0,
+    "cellMaxCurrent": 0,
+    "balancingCurrent": 0
+}
+}
+    ],
+    "EVChargers": []
+},
+    "ean": "541456700001772329",
+    "targetFleet": "<FLEET_STRING>"
+}
+    ]
+}
+    """;
+    try(OutputStream os = conn.getOutputStream()) {
+    byte[] input = jsonInputString.getBytes("utf-8");
+    os.write(input, 0, input.length);
+}
+    BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+    StringBuilder response = new StringBuilder();
+    String responseLine = null;
+    while ((responseLine = br.readLine()) != null) {
+    response.append(responseLine.trim());
+}
+    System.out.println(response.toString());
+}
+}
+    ```
+
+</CodeGroup>
+
+The response will look like this:
+
+```json
+[
+  {
+    "thingName": "site-unique-id",
+    "settings": {
+      /* ... */
+    },
+    "status": true,
+    "index": 123
+  }
+]
+```
+
+<ResponseField name="thingName" type="string">
+    A unique ID for the site, used for further individual calls.
+</ResponseField>
+  <ResponseField name="settings" type="object">
+    The settings object that was provided when creating the site.
+</ResponseField>
+  <ResponseField name="status" type="boolean">
+    Indicates whether the specific device creation was successful.
+</ResponseField>
+  <ResponseField name="index" type="integer">
+    The index of the device in the incoming devices array.
+</ResponseField>
+
+### Delete Sites
+
+To remove existing sites, send a DELETE request to the `/devices` endpoint. You can specify one or more sites to delete by providing their EANs in the request body. Below are the required parameters:
+
+<ResponseField name="devices" type="array" required="true">
+    An array of site objects to delete. Each object must include:
+    <Expandable title="properties">
+        <ResponseField name="ean" type="string" required="true">
+            The EAN of the site to be deleted.
+        </ResponseField>
+    </Expandable>
+</ResponseField>
+
+    <CodeGroup>
+
+        ```python delete-sites.py
+        import requests
+
+        url = "https://api.io-comms.com/next/devices"
+        headers = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <BEARER_TOKEN>"
+    }
+        data = {
+        "devices": [
+    {"ean": "<EAN_STRING>"}
+        ]
+    }
+        response = requests.delete(url, headers=headers, json=data)
+        print(response.json())
+        ```
+
+        ```javascript delete-sites.js
+        const fetch = require('node-fetch');
+
+        const url = 'https://api.io-comms.com/next/devices';
+        const data = {
+        devices: [
+    { ean: '<EAN_STRING>' }
+        ]
+    };
+
+        fetch(url, {
+        method: 'DELETE',
+        headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer <BEARER_TOKEN>'
+    },
+        body: JSON.stringify(data, null, 2)
+    })
+        .then(res => res.json())
+        .then(json => console.log(json));
+        ```
+
+        ```java DeleteSites.java
+        import java.net.HttpURLConnection;
+        import java.net.URL;
+        import java.io.OutputStream;
+        import java.io.BufferedReader;
+        import java.io.InputStreamReader;
+
+        public class DeleteSites {
+        public static void main(String[] args) throws Exception {
+        URL url = new URL("https://api.io-comms.com/next/devices");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("DELETE");
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Authorization", "Bearer <BEARER_TOKEN>");
+        conn.setDoOutput(true);
+        String jsonInputString = """
+    {
+        \"devices\": [
+    {\"ean\": \"<EAN_STRING>\"}
+        ]
+    }
+        """;
+        try(OutputStream os = conn.getOutputStream()) {
+        byte[] input = jsonInputString.getBytes("utf-8");
+        os.write(input, 0, input.length);
+    }
+        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+        StringBuilder response = new StringBuilder();
+        String responseLine = null;
+        while ((responseLine = br.readLine()) != null) {
+        response.append(responseLine.trim());
+    }
+        System.out.println(response.toString());
+    }
+    }
+        ```
+
+        </CodeGroup>
+
+### List Sites
+
+**GET `/devices`**
+- Lists all your available devices (sites).
+
+<CodeGroup>
+
+    ```python list-sites.py
+    import requests
+
+    url = "https://api.io-comms.com/v1/devices"
+    headers = {"Authorization": "Bearer <token>"}
+    response = requests.get(url, headers=headers)
+    print(response.json())
+    ```
+
+    ```javascript list-sites.js
+    const fetch = require('node-fetch');
+    const url = 'https://api.io-comms.com/v1/devices';
+    const options = {
+    method: 'GET',
+    headers: { 'Authorization': 'Bearer <token>' }
+};
+    fetch(url, options)
+    .then(res => res.json())
+    .then(json => console.log(json));
+    ```
+
+    ```java ListSites.java
+    import java.net.HttpURLConnection;
+    import java.net.URL;
+    import java.io.BufferedReader;
+    import java.io.InputStreamReader;
+
+    public class ListSites {
+    public static void main(String[] args) throws Exception {
+    URL url = new URL("https://api.io-comms.com/v1/devices");
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    conn.setRequestMethod("GET");
+    conn.setRequestProperty("Authorization", "Bearer <token>");
+    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+    String inputLine;
+    StringBuffer content = new StringBuffer();
+    while ((inputLine = in.readLine()) != null) {
+    content.append(inputLine);
+}
+    in.close();
+    System.out.println(content.toString());
+}
+}
+    ```
+
+</CodeGroup>
+
+_Response:_
+
+    ```json
+{
+  "devices": [
+    {
+      "ean": "541456700001772328",
+      "settings": { }
+    }
+  ]
+}
+```
+
+
+
+### Get Site Info
+
+**GET `/devices/{id}`**
+- Displays information from a specific site.
+
+```python
+import requests
+
+site_id = "541456700001772328"
+url = f"https://api.io-comms.com/v1/devices/{site_id}"
+headers = {"Authorization": "Bearer <token>"}
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+_Response:_
+    ```json
+{
+  "ean": "541456700001772328",
+  "settings": { },
+  "status": true
+}
+```
+
+### Edit a Site
+
+**PUT `/devices/{id}`**
+- Edits an existing site’s settings.
+- Body: JSON matching the `editRequestSingle` schema.
+
+```python
+import requests
+
+site_id = "541456700001772328"
+url = f"https://api.io-comms.com/v1/devices/{site_id}"
+headers = {
+    "Authorization": "Bearer <token>",
+    "Content-Type": "application/json"
+}
+data = {
+    "settings": { }
+}
+response = requests.put(url, headers=headers, json=data)
+print(response.json())
+```
+_Response:_
+    ```json
+{
+  "thingName": "541456700001772328",
+  "status": true,
+  "settings": { }
+}
+```
+
+### Delete a Site
+
+**DELETE `/devices/{id}`**
+- Removes an existing site.
+
+```python
+import requests
+
+site_id = "541456700001772328"
+url = f"https://api.io-comms.com/v1/devices/{site_id}"
+headers = {"Authorization": "Bearer <token>"}
+response = requests.delete(url, headers=headers)
+print(response.json())
+```
+_Response:_
+    ```json
+{
+  "thingName": "541456700001772328",
+  "status": true
+}
+```
+
+## Working with Site Data
+
+Want to send in data or fetch site setpoints? Use the `/devices/{id}/data` endpoint:
+
+### Push Site Data
+
+**POST `/devices/{id}/data`**
+- Send new data for your site.
+- Body: JSON matching the `dataPostRequest` schema.
+
+```python
+import requests
+
+site_id = "541456700001772328"
+url = f"https://api.io-comms.com/v1/devices/{site_id}/data"
+headers = {
+    "Authorization": "Bearer <token>",
+    "Content-Type": "application/json"
+}
+data = {
+    "acCoupledPvPower": 1000,
+    "dcCoupledPvPower": 200,
+    "gridPower": 1000,
+    "meterPower": 5000,
+    "stateOfCharge": 2,
+    "storageCurrent": 50,
+    "storagePower": 50.01,
+    "timestamp": 1661076259171
+}
+response = requests.post(url, headers=headers, json=data)
+print(response.json())
+```
+_Response:_
+    ```json
+{
+  "acCoupledPvPower": 1000,
+  "dcCoupledPvPower": 200,
+  "gridPower": 1000,
+  "meterPower": 5000,
+  "stateOfCharge": 2,
+  "storageCurrent": 50,
+  "storagePower": 50.01,
+  "timestamp": 1661076259171
+}
+```
+
+### Get Site Setpoints
+
+**GET `/devices/{id}/data`**
+- Fetch setpoints for your site.
+
+```python
+import requests
+
+site_id = "541456700001772328"
+url = f"https://api.io-comms.com/v1/devices/{site_id}/data"
+headers = {"Authorization": "Bearer <token>"}
+response = requests.get(url, headers=headers)
+print(response.json())
+```
+_Response:_
+    ```json
+{
+  "powerSetpointACDC": 1000,
+  "powerSetpointBat": 1000,
+  "powerSetpointMeter": 1000,
+  "timestamp": 1661076259171
+}
+```

@@ -1,0 +1,17 @@
+---
+title: "List All Sites"
+openapi: "/api-reference/openapi.json GET /devices"
+description: You can request a list of a third party’s managed sites.
+---
+
+You can narrow down the results using these querystring parameters:
+
+<ParamField query="queryString" type="string">
+    A string representing an [AWS IoT query string](https://docs.aws.amazon.com/iot/latest/developerguide/query-syntax.html), used to narrow down the list of returned devices.
+</ParamField>
+<ParamField query="nextToken" type="string">
+    If there are more sites to show, you’ll get a pagination string with your list. You can use this string to keep browsing through the rest of your sites.
+</ParamField>
+<ParamField query="maxResults" type="string">
+    This number sets the maximum results you’ll see at once. If there are more results than this, you’ll get them in separate pages.
+</ParamField>

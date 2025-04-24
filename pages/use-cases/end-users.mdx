@@ -1,0 +1,43 @@
+---
+title: End user model
+description: The end user model is for sites with devices that are compatible with CloudFlex integration.
+sidebarTitle: End users
+---
+
+# What is expected of the end user?
+
+1. **Allow CloudFlex to control their devices** via the device brand’s API.
+2. **Provide unique site and device information** so CloudFlex can create a virtual site and configure the correct settings.
+
+# Integrations loop
+
+Once these steps are done, the [Integrations Loop](/pages/infrastructure/integrations-loop) will handle data collection and device control automatically.
+It does this through each brand's API.
+
+## Key Concepts
+
+<AccordionGroup>
+    <Accordion title="End-user authorization flow">
+        Users must authorize CloudFlex to access and control their devices, usually via [OAuth](https://en.wikipedia.org/wiki/OAuth) or a brand-specific process.
+    </Accordion>
+    <Accordion title="CloudFlex Integration">
+        CloudFlex connects to device brands via their cloud APIs to collect all the [required data](/pages/use-cases/enterprise) and send set points.
+    </Accordion>
+</AccordionGroup>
+- **End-user authorization flow:** Users must authorize CloudFlex to access and control their devices, usually via OAuth or a brand-specific process.
+- **CloudFlex Integration:** CloudFlex connects to device brands via their cloud APIs to collect data and send set points.
+- **Valorizing a CloudFlex Integration:** Ensuring the integration is set up and used to its full potential.
+
+### Supported CloudFlex Integrations (under evaluation)
+
+<Warning>Each device brand may require a different integration and authorization method. External documentation may be needed for bespoke integrations.</Warning>
+
+<CardGroup cols={2}>
+    <Card
+        href="https://support.huawei.com/enterprise/en/doc/EDOC1100379184/dba0b7c8/api-access"
+        img="/images/huawei.svg"
+    />
+    <Card
+        href="https://drive.google.com/drive/u/1/folders/1uPinlJqoehUOPrJyyTkumePHc4xfR9UU"
+        img="/images/enphase.png"/>
+</CardGroup>
