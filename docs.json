@@ -92,7 +92,7 @@
       {
         "anchor": "API Reference",
         "icon": "square-terminal",
-        "openapi": "api-reference/openapi.json"
+        "pages": ["/pages/api/introduction"]
       }
     ]
   },
